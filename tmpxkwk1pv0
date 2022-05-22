@@ -1,0 +1,44 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+
+#Concentration of species for absorbance measurement
+import numpy as np
+from scipy.io import loadmat
+from matplotlib.pyplot import *
+import pandas as pd
+mat_data = loadmat('data.mat') # load mat-file
+wavelengths = mat_data['WAV'][0] # dictionary element with the key = 'WAV' is a list of list.
+species=['Cr','Ni','Co'] # Name of the species in the order specified in the data
+species_con=pd.DataFrame(np.concatenate([mat_data['PureCrCONC'],mat_data['PureNiCONC'],
+ mat_data['PureCoCONC']],axis=1),columns=species)
+species_abs=pd.DataFrame(np.concatenate([mat_data['PureCr'],mat_data['PureNi'],
+ mat_data['PureCo']],axis=0),
+ columns=wavelengths,index=species)
+# concentration of each species in the mixtures (each repeated 5 times) - corresponds to Y/output
+mixture_con = pd.DataFrame(mat_data['CONC'],columns=species)
+mixture_abs = pd.DataFrame(mat_data['DATA'],columns=wavelengths) # absorbance data for each wavelength corresponds to X/input
+
+'''
+Function to plot spectra
+Arguments: df (pandas.DataFrame), labels (list), header (string), vlines (boolean)
+Returns: NoneType
+'''
+def plot_spectra(df,labels,header,vlines):
+ fig, ax = subplots(figsize=(15,4))
+ df.plot(ax=ax)
+ ax.legend(labels,loc='best');
+ ax.grid(True)
+ ax.set(title=header,xlabel='Wavelength (nm)',ylabel='Absorbance')
+ ax.set_ylim(-0.3,1.3)
+ if vlines:
+     vlines={408:'b',394:'orange',512:'g',574:'b'}
+     for i in vlines:
+         ax.axvline(x=i,color=vlines[i]) # drawing a blue vertical line at 408nm
+         ax.text(i+1,0.6,str(i),rotation=90)
+ # writing the wavelength value corresonding to the vertical line and placing the text vertically rotated
+ 
+ 
